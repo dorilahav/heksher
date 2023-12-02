@@ -6,9 +6,10 @@ type Field<T> = keyof T;
 type Fields<T> = Array<Field<T>>;
 type CallbackFunction = () => void;
 type CallbackMap<T> = Map<Fields<T>, CallbackFunction>;
+export type SubscribeFunction<T> = (fields: Fields<T>, callback: CallbackFunction) => UnsubscribeFunction;
 
 interface SubscribeToFieldsHook<T> {
-  subscribe: (fields: Fields<T>, callback: CallbackFunction) => UnsubscribeFunction;
+  subscribe: SubscribeFunction<T>;
   dispatch: (field: Field<T>) => void;
 }
 
