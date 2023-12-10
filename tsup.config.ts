@@ -5,7 +5,7 @@ const outDir = 'lib';
 
 const baseConfiguration = defineConfig({
   entry: {
-    'optimized-context': entryUrl
+    'heksher': entryUrl
   },
   clean: true,
   treeshake: true,

@@ -1,37 +1,37 @@
-<h1 align="center">Optimized Context</h1>
+<h1 align="center">Heksher</h1>
 
 <div align="center">
 
-**Optimized Context** is like the cool, upgraded sibling of the regular React Context API. It only triggers re-renders when the stuff you're using actually changes.
+**Heksher** is like the cool, upgraded sibling of the regular React Context API. It only triggers re-renders when the stuff you're using actually changes.
 
-[![Bundle Size](https://badgen.net/bundlephobia/minzip/optimized-context)](https://bundlephobia.com/package/optimized-context)
-[![Latest Version](https://badgen.net/npm/v/optimized-context)](https://www.npmjs.com/package/optimized-context)
+[![Bundle Size](https://badgen.net/bundlephobia/minzip/heksher)](https://bundlephobia.com/package/heksher)
+[![Latest Version](https://badgen.net/npm/v/heksher)](https://www.npmjs.com/package/heksher)
 
 </div>
 
 ## Installation
 ```bash
-npm install optimized-context # or yarn add optimized-context or pnpm add optimized-context
+npm install heksher # or yarn add heksher or pnpm add heksher
 ```
 
-Optimized Context requires `react@16.3.0` or newer to work, this is because in this version of react the new context api was introduced.
+Heksher requires `react@16.3.0` or newer to work, this is because in this version of react the new context api was introduced.
 
 ## Getting Started
 Lets add an auth mechanism to our beautiful app
 
-First we need to create an auth context:
+First we need to create an auth heksher:
 ```typescript jsx
 interface User {
   name: string,
   age: number
 };
 
-interface AuthContextValue {
+interface AuthHeksherValue {
   loggedUser?: User;
   isLoggedIn: boolean;
 }
 
-const AuthContext = createOptimizedContext<AuthContextValue>();
+const AuthHeksher = createHeksher<AuthHeksherValue>();
 ```
 
 Then lets create our provider:
@@ -44,9 +44,9 @@ const AuthProvider = ({children}: any) => {
   // Some login logic
   
   return (
-    <AuthContext.Provider value={{loggedUser, isLoggedIn}}>
+    <AuthHeksher.Provider value={{loggedUser, isLoggedIn}}>
       {children}
-    </AuthContext.Provider>
+    </AuthHeksher.Provider>
   );
 }
 ```
@@ -55,25 +55,25 @@ Looks familiar?
 Now lets create a simple `useAuth` hook:
 ```typescript jsx
 ...
-const useAuth = AuthContext.use;
+const useAuth = AuthHeksher.use;
 ```
 
-Thats it! We now have an optimized context, using it anywhere in our app will only trigger re-renders on the fields we used.
+Thats it! We now have an optimized heksher, using it anywhere in our app will only trigger re-renders on the fields we used.
 
 ## Best Practices
 ### Memoization
 Did you notice the example up there?
-No `useMemo` on the value object, kinda weird, huh? Well, the **Optimized Context** handles that for us, no need to wrap the value with useMemo.
+No `useMemo` on the value object, kinda weird, huh? Well, **Heksher** handles that for us, no need to wrap the value with useMemo.
 But hey, remember to memoize all the fields inside it, that's key.
 
 Lets see an example:
 ```typescript jsx
-interface RandomNumberContextValue {
+interface RandomNumberHeksherValue {
   number: number;
   generateNewNumber: (min: number, max: number) => void;
 }
 
-const RandomNumberContext = createOptimizedContext<RandomNumberContextValue>();
+const RandomNumberHeksher = createHeksher<RandomNumberHeksherValue>();
 
 const RandomNumberProvider = ({children}: any) => {
   const [number, setNumber] = useState(-1);
@@ -85,9 +85,9 @@ const RandomNumberProvider = ({children}: any) => {
   }
 
   return (
-    <RandomNumberContext.Provider value={{number, generateNewNumber}}>
+    <RandomNumberHeksher.Provider value={{number, generateNewNumber}}>
       {children}
-    </RandomNumberContext.Provider>
+    </RandomNumberHeksher.Provider>
   );
 }
 ```
@@ -108,12 +108,12 @@ This is much better.
 
 The final code will look like this:
 ```typescript jsx
-interface RandomNumberContextValue {
+interface RandomNumberHeksherValue {
   number: number;
   generateNewNumber: (min: number, max: number) => void;
 }
 
-const RandomNumberContext = createOptimizedContext<RandomNumberContextValue>();
+const RandomNumberHeksher = createHeksher<RandomNumberHeksherValue>();
 
 const RandomNumberProvider = ({children}: any) => {
   const [number, setNumber] = useState(-1);
@@ -125,9 +125,9 @@ const RandomNumberProvider = ({children}: any) => {
   }, []);
 
   return (
-    <RandomNumberContext.Provider value={{number, generateNewNumber}}>
+    <RandomNumberHeksher.Provider value={{number, generateNewNumber}}>
       {children}
-    </RandomNumberContext.Provider>
+    </RandomNumberHeksher.Provider>
   );
 }
 ```

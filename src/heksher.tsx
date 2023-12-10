@@ -2,12 +2,12 @@ import React, { PropsWithChildren, useDebugValue, useEffect, useMemo, useRef, us
 import { useSubscribeToFields, useTrackObjectFieldsUsage } from './hooks';
 import { SubscribeContext, createSubscribeContext, useSubscribeContext } from './subscribe-context';
 
-export interface OptimizedContextProviderProps<T> extends PropsWithChildren {
+export interface HeksherProviderProps<T> extends PropsWithChildren {
   value: T;
 }
 
-export interface OptimizedContext<T> {
-  Provider: (props: OptimizedContextProviderProps<T>) => JSX.Element;
+export interface Heksher<T> {
+  Provider: (props: HeksherProviderProps<T>) => JSX.Element;
   use: () => T;
 }
 
@@ -17,17 +17,17 @@ const getChangedFields = <T extends object>(oldValue: T, newValue: T): Array<key
   return keys.filter(key => oldValue[key] !== newValue[key]);
 }
 
-const ensureValidOptimizedContextValue = (value: unknown) => {
+const ensureValidHeksherValue = (value: unknown) => {
   if (typeof value !== 'object') {
     throw new Error(
-      'Invalid Usage! You passed a non-object value to an OptimizedContext.Provider.'
+      'Invalid Usage! You passed a non-object value to an Heksher.Provider.'
     );
   }
 }
 
-const createOptimizedContextProvider = <T extends object>(context: SubscribeContext<T>) => (
-  function OptimizedContextProvider({children, value}: OptimizedContextProviderProps<T>) {
-    ensureValidOptimizedContextValue(value);
+const createHeksherProvider = <T extends object>(subscribeContext: SubscribeContext<T>) => (
+  function HeksherProvider({children, value}: HeksherProviderProps<T>) {
+    ensureValidHeksherValue(value);
 
     const currentValueRef = useRef(value);
     const {subscribe, dispatch} = useSubscribeToFields<T>();
@@ -41,19 +41,19 @@ const createOptimizedContextProvider = <T extends object>(context: SubscribeCont
     const getValue = () => {
       return currentValueRef.current;
     }
-    
+
     return (
-      <context.Provider value={useMemo(() => ({subscribe, getValue}), [])}>
+      <subscribeContext.Provider value={useMemo(() => ({subscribe, getValue}), [])}>
         {children}
-      </context.Provider>
+      </subscribeContext.Provider>
     )
   }
 );
 
-const createUseOptimizedContext = <T extends object>(context: SubscribeContext<T>) => (
-  function useOptimizedContext() {
+const createUseHeksher = <T extends object>(subscribeContext: SubscribeContext<T>) => (
+  function useHeksher() {
     const usedFieldsRef = useRef<Set<keyof T>>(new Set());
-    const {subscribe, getValue} = useSubscribeContext(context);
+    const {subscribe, getValue} = useSubscribeContext(subscribeContext);
 
     const value = useSyncExternalStore((onValueChange) => subscribe([...usedFieldsRef.current], onValueChange), getValue);
 
@@ -63,11 +63,11 @@ const createUseOptimizedContext = <T extends object>(context: SubscribeContext<T
   }
 );
 
-export const createOptimizedContext = <T extends object>(): OptimizedContext<T> => {
-  const context = createSubscribeContext<T>();
+export const createHeksher = <T extends object>(): Heksher<T> => {
+  const subscribeContext = createSubscribeContext<T>();
 
   return {
-    Provider: createOptimizedContextProvider(context),
-    use: createUseOptimizedContext(context)
+    Provider: createHeksherProvider(subscribeContext),
+    use: createUseHeksher(subscribeContext)
   }
 }
