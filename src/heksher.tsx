@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, useDebugValue, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import { useSubscribeToFields, useTrackObjectFieldsUsage } from './hooks';
 import { SubscribeContext, createSubscribeContext, useSubscribeContext } from './subscribe-context';
+import {dispatchChanges} from './utils';
 
 export interface HeksherProviderProps<T> extends PropsWithChildren {
   value: T;
@@ -9,12 +10,6 @@ export interface HeksherProviderProps<T> extends PropsWithChildren {
 export interface Heksher<T> {
   Provider: (props: HeksherProviderProps<T>) => JSX.Element;
   use: () => T;
-}
-
-const getChangedFields = <T extends object>(oldValue: T, newValue: T): Array<keyof T> => {
-  const keys = [...new Set(Object.keys(oldValue).concat(Object.keys(newValue)))] as Array<keyof T>;
-
-  return keys.filter(key => oldValue[key] !== newValue[key]);
 }
 
 const ensureValidHeksherValue = (value: unknown) => {
@@ -28,14 +23,14 @@ const ensureValidHeksherValue = (value: unknown) => {
 const createHeksherProvider = <T extends object>(subscribeContext: SubscribeContext<T>) => (
   function HeksherProvider({children, value}: HeksherProviderProps<T>) {
     ensureValidHeksherValue(value);
-
     const currentValueRef = useRef(value);
     const {subscribe, dispatch} = useSubscribeToFields<T>();
 
     useEffect(() => {
       const oldValue = currentValueRef.current;
       currentValueRef.current = value;
-      getChangedFields(oldValue, value).forEach(dispatch);
+
+      dispatchChanges(oldValue, value, dispatch);
     }, [value]);
 
     const getValue = () => {
