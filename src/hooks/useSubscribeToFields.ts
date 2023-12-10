@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useInitializedRef } from './useInitializedRef';
 
 type UnsubscribeFunction = () => void;
@@ -8,9 +8,16 @@ type CallbackFunction = () => void;
 type CallbackMap<T> = Map<Fields<T>, CallbackFunction>;
 export type SubscribeFunction<T> = (fields: Fields<T>, callback: CallbackFunction) => UnsubscribeFunction;
 
+type DispatchFieldFunction<T> = (field: Field<T>) => void;
+type DispatchAllFunction = () => void;
+export interface DispatchFunctions<T> {
+  field: DispatchFieldFunction<T>;
+  all: DispatchAllFunction;
+}
+
 interface SubscribeToFieldsHook<T> {
   subscribe: SubscribeFunction<T>;
-  dispatch: (field: Field<T>) => void;
+  dispatch: DispatchFunctions<T>;
 }
 
 export const useSubscribeToFields = <T>(): SubscribeToFieldsHook<T> => {
@@ -24,15 +31,20 @@ export const useSubscribeToFields = <T>(): SubscribeToFieldsHook<T> => {
     }
   }, []);
 
-  const dispatch = useCallback((field: Field<T>) => {
-    const fieldsToCall = [...callbackMapRef.current.keys()].filter((fields) => fields.includes(field));
+  const dispatch = useMemo<DispatchFunctions<T>>(() => ({
+    field: (field: Field<T>) => {
+      const fieldsToCall = [...callbackMapRef.current.keys()].filter((fields) => fields.includes(field));
 
-    fieldsToCall.forEach((fields) => {
-      const callback = callbackMapRef.current.get(fields);
+      fieldsToCall.forEach((fields) => {
+        const callback = callbackMapRef.current.get(fields);
 
-      callback!();
-    });
-  }, []);
+        callback!();
+      });
+    },
+    all: () => {
+      [...callbackMapRef.current.values()].forEach(x => x());
+    }
+  }), []);
 
   return {
     subscribe,
