@@ -1,3 +1,3 @@
-export { createOptimizedContext } from './optimized-context';
-export type { OptimizedContext, OptimizedContextProviderProps } from './optimized-context';
+export { createHeksher } from './heksher';
+export type { Heksher, HeksherProviderProps } from './heksher';
 

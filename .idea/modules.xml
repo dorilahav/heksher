@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/optimized-context.iml" filepath="$PROJECT_DIR$/.idea/optimized-context.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/heksher.iml" filepath="$PROJECT_DIR$/.idea/heksher.iml" />
     </modules>
   </component>
 </project>
