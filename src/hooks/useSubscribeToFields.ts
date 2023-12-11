@@ -2,27 +2,25 @@ import { useCallback, useMemo } from 'react';
 import { usePersistedMap } from './usePersistedMap';
 
 type UnsubscribeFunction = () => void;
-type Field<T> = keyof T;
-type Fields<T> = Array<Field<T>>;
 type CallbackFunction = () => void;
-export type SubscribeFunction<T> = (fields: Fields<T>, callback: CallbackFunction) => UnsubscribeFunction;
+export type SubscribeFunction = (fields: string[], callback: CallbackFunction) => UnsubscribeFunction;
 
-type DispatchFieldFunction<T> = (field: Field<T>) => void;
+type DispatchFieldFunction = (field: string) => void;
 type DispatchAllFunction = () => void;
-export interface DispatchFunctions<T> {
-  field: DispatchFieldFunction<T>;
+export interface DispatchFunctions {
+  field: DispatchFieldFunction;
   all: DispatchAllFunction;
 }
 
-interface SubscribeToFieldsHook<T> {
-  subscribe: SubscribeFunction<T>;
-  dispatch: DispatchFunctions<T>;
+interface SubscribeToFieldsHook {
+  subscribe: SubscribeFunction;
+  dispatch: DispatchFunctions;
 }
 
-export const useSubscribeToFields = <T>(): SubscribeToFieldsHook<T> => {
-  const callbackMap = usePersistedMap<Fields<T>, CallbackFunction>();
+export const useSubscribeToFields = (): SubscribeToFieldsHook => {
+  const callbackMap = usePersistedMap<string[], CallbackFunction>();
 
-  const subscribe = useCallback((fields: Fields<T>, callback: CallbackFunction) => {
+  const subscribe = useCallback((fields: string[], callback: CallbackFunction) => {
     callbackMap.set(fields, callback);
 
     return () => {
@@ -30,8 +28,8 @@ export const useSubscribeToFields = <T>(): SubscribeToFieldsHook<T> => {
     }
   }, []);
 
-  const dispatch = useMemo<DispatchFunctions<T>>(() => ({
-    field: (field: Field<T>) => {
+  const dispatch = useMemo<DispatchFunctions>(() => ({
+    field: (field: string) => {
       const fieldsToCall = [...callbackMap.keys()].filter((fields) => fields.includes(field));
 
       fieldsToCall.forEach((fields) => {

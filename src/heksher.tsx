@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useDebugValue, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
-import { useSubscribeToFields, useTrackObjectFieldsUsage } from './hooks';
+import { useSubscribeToFields } from './hooks';
 import { SubscribeContext, createSubscribeContext, useSubscribeContext } from './subscribe-context';
-import {dispatchChanges} from './utils';
+import { dispatchChanges, doesValueHaveFields, fieldUsageDecorator } from './utils';
 
 export interface HeksherProviderProps<T> extends PropsWithChildren {
   value: T;
@@ -12,19 +12,10 @@ export interface Heksher<T> {
   use: () => T;
 }
 
-const ensureValidHeksherValue = (value: unknown) => {
-  if (typeof value !== 'object') {
-    throw new Error(
-      'Invalid Usage! You passed a non-object value to an Heksher.Provider.'
-    );
-  }
-}
-
-const createHeksherProvider = <T extends object>(subscribeContext: SubscribeContext<T>) => (
+const createHeksherProvider = <T,>(subscribeContext: SubscribeContext<T>) => (
   function HeksherProvider({children, value}: HeksherProviderProps<T>) {
-    ensureValidHeksherValue(value);
     const currentValueRef = useRef(value);
-    const {subscribe, dispatch} = useSubscribeToFields<T>();
+    const {subscribe, dispatch} = useSubscribeToFields();
 
     useEffect(() => {
       const oldValue = currentValueRef.current;
@@ -45,20 +36,20 @@ const createHeksherProvider = <T extends object>(subscribeContext: SubscribeCont
   }
 );
 
-const createUseHeksher = <T extends object>(subscribeContext: SubscribeContext<T>) => (
+const createUseHeksher = <T,>(subscribeContext: SubscribeContext<T>) => (
   function useHeksher() {
-    const usedFieldsRef = useRef<Set<keyof T>>(new Set());
+    const usedFieldsRef = useRef<Set<string>>(new Set());
     const {subscribe, getValue} = useSubscribeContext(subscribeContext);
 
     const value = useSyncExternalStore((onValueChange) => subscribe([...usedFieldsRef.current], onValueChange), getValue);
 
     useDebugValue(value);
 
-    return useTrackObjectFieldsUsage(value, usedFieldsRef.current);
+    return doesValueHaveFields(value) ? fieldUsageDecorator(value, usedFieldsRef.current) : value;
   }
 );
 
-export const createHeksher = <T extends object>(): Heksher<T> => {
+export const createHeksher = <T,>(): Heksher<T> => {
   const subscribeContext = createSubscribeContext<T>();
 
   return {
