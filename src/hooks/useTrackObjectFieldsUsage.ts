@@ -1,11 +1,9 @@
-import { MutableRefObject } from 'react';
-
-export const useTrackObjectFieldsUsage = <T extends {}>(object: T, usedFieldsRef: MutableRefObject<Set<keyof T>>): T => {
-  usedFieldsRef.current.clear();
+export const useTrackObjectFieldsUsage = <T extends {}>(object: T, usedFieldsSet: Set<keyof T>): T => {
+  usedFieldsSet.clear();
 
   return new Proxy(object, {
     get: (object, accessedKey) => {
-      usedFieldsRef.current.add(accessedKey as keyof T);
+      usedFieldsSet.add(accessedKey as keyof T);
       return object[accessedKey];
     }
   });
