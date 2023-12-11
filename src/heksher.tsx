@@ -54,7 +54,7 @@ const createUseHeksher = <T extends object>(subscribeContext: SubscribeContext<T
 
     useDebugValue(value);
 
-    return useTrackObjectFieldsUsage(value, usedFieldsRef);
+    return useTrackObjectFieldsUsage(value, usedFieldsRef.current);
   }
 );
 
