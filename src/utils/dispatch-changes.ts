@@ -1,14 +1,19 @@
-import {DispatchFunctions} from '../hooks';
-const getChangedFields = <T extends object>(oldValue: T, newValue: T): Array<keyof T> => {
-  const keys = [...new Set(Object.keys(oldValue).concat(Object.keys(newValue)))] as Array<keyof T>;
+import { DispatchFunctions } from '../hooks';
+import { doesValueHaveFields } from './does-value-have-fields';
+
+const getChangedFields = (oldValue: unknown, newValue: unknown): Array<string> => {
+  const keys = [...new Set(Object.keys(oldValue).concat(Object.keys(newValue)))];
 
   return keys.filter(key => oldValue[key] !== newValue[key]);
 }
 
-export const dispatchChanges = <T extends object>(oldValue: T, newValue: T, dispatch: DispatchFunctions<T>) => {
-  if (Array.isArray(newValue)) {
-    dispatch.all();
-  } else {
+const shouldDispatchChangeForSpecificFields = (oldValue: unknown, newValue: unknown): boolean =>
+  doesValueHaveFields(oldValue) && doesValueHaveFields(newValue);
+
+export const dispatchChanges = (oldValue: unknown, newValue: unknown, dispatch: DispatchFunctions) => {
+  if (shouldDispatchChangeForSpecificFields(oldValue, newValue)) {
     getChangedFields(oldValue, newValue).forEach(dispatch.field);
+  } else {
+    dispatch.all();
   }
 }
