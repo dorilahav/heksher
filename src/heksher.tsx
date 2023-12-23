@@ -3,17 +3,42 @@ import { useSubscribeToFields } from './hooks';
 import { SubscribeContext, createSubscribeContext, useSubscribeContext } from './subscribe-context';
 import { dispatchChanges, doesValueHaveFields, fieldUsageDecorator } from './utils';
 
-export interface HeksherProviderProps<T> extends PropsWithChildren {
-  value: T;
+export interface HeksherProviderProps<THeksherValue> extends PropsWithChildren {
+  /**
+   * The value to pass down to the child components.
+   */
+  value: THeksherValue;
 }
 
-export interface Heksher<T> {
-  Provider: (props: HeksherProviderProps<T>) => JSX.Element;
-  use: () => T;
+/**
+ * A Provider component is used to provide the value to pass down child components.
+ * Usually this component will be wrapped with another component that will handle all the logic associated with providing the value.
+ */
+export type HeksherProviderComponent<THeksherValue> = (props: HeksherProviderProps<THeksherValue>) => JSX.Element
+
+/**
+ * A use hook is used to get the passed down value from the nearest parent Provider.
+ * Usually this hook will be wrapped with another hook in order to be able to add additional logic if ever needed.
+ */
+export type HeksherUseHook<THeksherValue> = () => THeksherValue;
+
+/**
+ * The Heksher object containing everything to pass down values to child components.
+ */
+export interface Heksher<THeksherValue> {
+  /**
+   * {@inheritdoc HeksherProviderComponent}
+   */
+  Provider: HeksherProviderComponent<THeksherValue>;
+
+  /**
+   * {@inheritdoc HeksherUseHook}
+   */
+  use: HeksherUseHook<THeksherValue>;
 }
 
-const createHeksherProvider = <T,>(subscribeContext: SubscribeContext<T>) => (
-  function HeksherProvider({children, value}: HeksherProviderProps<T>) {
+const createHeksherProvider = <THeksherValue,>(subscribeContext: SubscribeContext<THeksherValue>) => (
+  function HeksherProvider({children, value}: HeksherProviderProps<THeksherValue>) {
     const currentValueRef = useRef(value);
     const {subscribe, dispatch} = useSubscribeToFields();
 
@@ -36,7 +61,7 @@ const createHeksherProvider = <T,>(subscribeContext: SubscribeContext<T>) => (
   }
 );
 
-const createUseHeksher = <T,>(subscribeContext: SubscribeContext<T>) => (
+const createUseHeksher = <THeksherValue,>(subscribeContext: SubscribeContext<THeksherValue>) => (
   function useHeksher() {
     const usedFieldsRef = useRef<Set<string>>(new Set());
     const {subscribe, getValue} = useSubscribeContext(subscribeContext);
@@ -49,8 +74,35 @@ const createUseHeksher = <T,>(subscribeContext: SubscribeContext<T>) => (
   }
 );
 
-export const createHeksher = <T,>(): Heksher<T> => {
-  const subscribeContext = createSubscribeContext<T>();
+/**
+ * A function that is used to create a new Heksher.
+ * @typeParam TValue - The value passed down by Heksher.
+ * @returns a {@link Heksher} object with a {@link HeksherProvider} to provide a value and a {@link HeksherUseHook} to use it.
+ * 
+ * @remarks
+ * A heksher is a more optimized version of a react context.
+ * Instead of re-rendering every component that used the context, heksher is only re-rendering the components which are using fields that changed inside the value object.
+ * Using heksher can reduce a lot of unneccessary renders without the need to learn a new api.
+ * 
+ * @example
+ * ```typescript jsx
+ * const NumberHeksher = createHeksher<number>();
+ * 
+ * const NumberDisplay = () => {
+ *  const number = NumberHeksher.use();
+ * 
+ *  return <div>{number}</div>;
+ * }
+ * 
+ * const App = () => (
+ *  <NumberHeksher.Provider value={100}>
+ *    <NumberDisplay/>
+ *  </NumberHeksher.Provider>
+ * );
+ * ```
+ */
+export const createHeksher = <TValue,>(): Heksher<TValue> => {
+  const subscribeContext = createSubscribeContext<TValue>();
 
   return {
     Provider: createHeksherProvider(subscribeContext),
