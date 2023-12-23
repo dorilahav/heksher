@@ -1,6 +1,6 @@
 {
   "name": "heksher",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Heksher is like the cool, upgraded sibling of the regular React Context API",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -10,8 +10,18 @@
   "files": [
     "lib/"
   ],
+  "keywords": [
+    "react",
+    "state-management",
+    "state",
+    "react-context"
+  ],
   "author": "Dori Lahav Waisberg",
-  "license": "ISC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dorilahav/heksher/issues"
+  },
+  "homepage": "https://github.com/dorilahav/heksher",
   "peerDependencies": {
     "react": ">16.3.0"
   },
