@@ -1,9 +1,15 @@
-import React, { PropsWithChildren, useDebugValue, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
+import React, { ReactNode, useDebugValue, useEffect, useMemo, useRef } from 'react';
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import { useSubscribeToFields } from './hooks';
 import { SubscribeContext, createSubscribeContext, useSubscribeContext } from './subscribe-context';
 import { dispatchChanges, doesValueHaveFields, fieldUsageDecorator } from './utils';
 
-export interface HeksherProviderProps<THeksherValue> extends PropsWithChildren {
+export interface HeksherProviderProps<THeksherValue> {
+  /**
+   * React's standard children prop. It's required because a Provider must wrap at least one component in order to be useful.
+   */
+  children: ReactNode;
+
   /**
    * The value to pass down to the child components.
    */
