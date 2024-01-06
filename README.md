@@ -14,7 +14,7 @@
 npm install heksher # or yarn add heksher or pnpm add heksher
 ```
 
-Heksher requires `react@16.3.0` or newer to work, this is because in this version of react the new context api was introduced.
+Heksher requires `react@16.9.0` or newer in order to work.
 
 ## Getting Started
 Lets suppose we are creating a game app and we want to tell our entire app the current time (which is fetched from the server).
