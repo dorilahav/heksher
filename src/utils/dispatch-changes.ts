@@ -11,8 +11,12 @@ const shouldDispatchChangeForSpecificFields = (oldValue: unknown, newValue: unkn
   doesValueHaveFields(oldValue) && doesValueHaveFields(newValue);
 
 export const dispatchChanges = (oldValue: unknown, newValue: unknown, dispatch: DispatchFunctions) => {
+  if (oldValue === newValue) {
+    return;
+  }
+  
   if (shouldDispatchChangeForSpecificFields(oldValue, newValue)) {
-    getChangedFields(oldValue, newValue).forEach(dispatch.field);
+    getChangedFields(oldValue, newValue).forEach(changedField => dispatch.field(changedField));
   } else {
     dispatch.all();
   }
