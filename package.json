@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsup",
     "prepack": "npm run build",
-    "test": "jest"
+    "test": "jest --silent=false"
   },
   "files": [
     "lib/"

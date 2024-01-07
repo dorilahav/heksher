@@ -1,4 +1,4 @@
-import React, { ReactNode, useDebugValue, useEffect, useMemo, useRef } from 'react';
+import React, { ReactNode, useDebugValue, useMemo, useRef } from 'react';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import { useSubscribeToFields } from './hooks';
 import { SubscribeContext, createSubscribeContext, useSubscribeContext } from './subscribe-context';
@@ -48,12 +48,12 @@ const createHeksherProvider = <THeksherValue,>(subscribeContext: SubscribeContex
     const currentValueRef = useRef(value);
     const {subscribe, dispatch} = useSubscribeToFields();
 
-    useEffect(() => {
+    if (value !== currentValueRef.current) {
       const oldValue = currentValueRef.current;
       currentValueRef.current = value;
 
       dispatchChanges(oldValue, value, dispatch);
-    }, [value]);
+    }
 
     const getValue = () => {
       return currentValueRef.current;
