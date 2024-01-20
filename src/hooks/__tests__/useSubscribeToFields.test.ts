@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react-hooks';
-import * as usePersistedMapModule from '../usePersistedMap';
+import * as usePersistedClassValue from '../usePersistedClassValue';
 import { useSubscribeToFields } from '../useSubscribeToFields';
 
 const injectFooBarCallbacks = () => {
@@ -7,7 +7,7 @@ const injectFooBarCallbacks = () => {
   const barCallback = jest.fn();
   const foobarCallback = jest.fn();
 
-  jest.spyOn(usePersistedMapModule, 'usePersistedMap').mockReturnValue(new Map([
+  jest.spyOn(usePersistedClassValue, 'usePersistedClassValue').mockReturnValue(new Map([
     [['foo'], fooCallback],
     [['bar'], barCallback],
     [['foo', 'bar'], foobarCallback]
@@ -23,7 +23,7 @@ const injectFooBarCallbacks = () => {
 const injectCallbackMap = (): Map<string[], () => void> => {
   const callbackMap = new Map();
 
-  jest.spyOn(usePersistedMapModule, 'usePersistedMap').mockReturnValue(callbackMap);
+  jest.spyOn(usePersistedClassValue, 'usePersistedClassValue').mockReturnValue(callbackMap);
 
   return callbackMap;
 }

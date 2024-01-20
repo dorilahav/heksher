@@ -1,6 +1,6 @@
 import React, { ReactNode, useDebugValue, useEffect, useMemo, useRef } from 'react';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
-import { useSubscribeToFields } from './hooks';
+import { usePersistedClassValue, useSubscribeToFields } from './hooks';
 import { SubscribeContext, createSubscribeContext, useSubscribeContext } from './subscribe-context';
 import { dispatchChanges, doesValueHaveFields, fieldUsageDecorator } from './utils';
 
@@ -69,14 +69,14 @@ const createHeksherProvider = <THeksherValue,>(subscribeContext: SubscribeContex
 
 const createUseHeksher = <THeksherValue,>(subscribeContext: SubscribeContext<THeksherValue>) => (
   function useHeksher() {
-    const usedFieldsRef = useRef<Set<string>>(new Set());
+    const usedFields = usePersistedClassValue(Set<string>);
     const {subscribe, getValue} = useSubscribeContext(subscribeContext);
 
-    const value = useSyncExternalStore((onValueChange) => subscribe([...usedFieldsRef.current], onValueChange), getValue);
+    const value = useSyncExternalStore((onValueChange) => subscribe([...usedFields], onValueChange), getValue);
 
     useDebugValue(value);
 
-    return doesValueHaveFields(value) ? fieldUsageDecorator(value, usedFieldsRef.current) : value;
+    return doesValueHaveFields(value) ? fieldUsageDecorator(value, usedFields) : value;
   }
 );
 

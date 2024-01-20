@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { usePersistedMap } from './usePersistedMap';
+import { usePersistedClassValue } from './usePersistedClassValue';
 
 type UnsubscribeFunction = () => void;
 type CallbackFunction = () => void;
@@ -18,7 +18,7 @@ export interface SubscribeToFieldsHook {
 }
 
 export const useSubscribeToFields = (): SubscribeToFieldsHook => {
-  const callbackMap = usePersistedMap<string[], CallbackFunction>();
+  const callbackMap = usePersistedClassValue(Map<string[], CallbackFunction>);
 
   const subscribe = useCallback((fields: string[], callback: CallbackFunction) => {
     callbackMap.set(fields, callback);
