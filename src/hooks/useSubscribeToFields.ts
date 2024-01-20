@@ -12,7 +12,7 @@ export interface DispatchFunctions {
   all: DispatchAllFunction;
 }
 
-interface SubscribeToFieldsHook {
+export interface SubscribeToFieldsHook {
   subscribe: SubscribeFunction;
   dispatch: DispatchFunctions;
 }

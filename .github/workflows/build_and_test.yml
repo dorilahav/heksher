@@ -1,0 +1,26 @@
+name: Build And Test
+on: [pull_request, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        react-version: ['16.9.0', '^16.9.0', '^17.0.0', '^18.0.0']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use node 20
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - run: npm ci
+
+    - name: Install testing dependencies
+      run: npm i -D react@${{matrix.react-version}} @types/react@${{matrix.react-version}} react-test-renderer@${{matrix.react-version}} --force
+      
+    - run: npm run build
+    - run: npm test

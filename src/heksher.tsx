@@ -8,7 +8,7 @@ export interface HeksherProviderProps<THeksherValue> {
   /**
    * React's standard children prop. It's required because a Provider must wrap at least one component in order to be useful.
    */
-  children: ReactNode;
+  children?: ReactNode;
 
   /**
    * The value to pass down to the child components.
