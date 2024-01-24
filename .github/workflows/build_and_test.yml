@@ -6,7 +6,7 @@ jobs:
 
     strategy:
       matrix:
-        react-version: ['16.9.0', '^16.9.0', '^17.0.0', '^18.0.0']
+        react-version: ['16.9.0', '16.14.0', '17.0.2', '18.0.0', '18.2.0']
 
     steps:
     - uses: actions/checkout@v4
@@ -19,8 +19,17 @@ jobs:
 
     - run: npm ci
 
-    - name: Install testing dependencies
-      run: npm i -D react@${{matrix.react-version}} @types/react@${{matrix.react-version}} react-test-renderer@${{matrix.react-version}} --force
+    - name: Install react version
+      run: npm i -D react@${{matrix.react-version}} @types/react@~${{matrix.react-version}} react-test-renderer@${{matrix.react-version}} --force
+
+    - name: Install legacy testing dependencies
+      if: ${{ startsWith(matrix.react-version, '16.') || startsWith(matrix.react-version, '17.') }}
+      run: |
+        npm uninstall @testing-library/react
+        npm i -D @testing-library/react-hooks
       
     - run: npm run build
     - run: npm test
+
+    - name: React details
+      run: cat node_modules/react/package.json

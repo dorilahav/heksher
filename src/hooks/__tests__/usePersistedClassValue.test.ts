@@ -1,4 +1,3 @@
-import { renderHook } from '@testing-library/react-hooks';
 import { usePersistedClassValue } from '../usePersistedClassValue';
 
 describe('usePersistedClassValue', () => {
