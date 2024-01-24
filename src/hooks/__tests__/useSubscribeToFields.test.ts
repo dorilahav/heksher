@@ -1,4 +1,3 @@
-import { act, renderHook } from '@testing-library/react-hooks';
 import * as usePersistedClassValue from '../usePersistedClassValue';
 import { useSubscribeToFields } from '../useSubscribeToFields';
 
