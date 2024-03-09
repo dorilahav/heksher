@@ -1,8 +1,10 @@
 import React, { ReactNode, useDebugValue, useEffect, useMemo, useRef } from 'react';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
-import { usePersistedClassValue, useSubscribeToFields } from './hooks';
+import { usePersistedClassValue } from './hooks';
+import { useCallbackSubscription } from './hooks/useSubscribeToFields';
+import { RenderStrategy, createDefaultRenderStrategy, isRenderStrategy } from './render-strategy';
 import { SubscribeContext, createSubscribeContext, useSubscribeContext } from './subscribe-context';
-import { dispatchChanges, doesValueHaveFields, fieldUsageDecorator } from './utils';
+import { doesValueHaveFields, fieldUsageDecorator } from './utils';
 
 export interface HeksherProviderProps<THeksherValue> {
   /**
@@ -13,7 +15,7 @@ export interface HeksherProviderProps<THeksherValue> {
   /**
    * The value to pass down to the child components.
    */
-  value: THeksherValue;
+  value: RenderStrategy<THeksherValue> | THeksherValue;
 }
 
 /**
@@ -44,20 +46,23 @@ export interface Heksher<THeksherValue> {
 }
 
 const createHeksherProvider = <THeksherValue,>(subscribeContext: SubscribeContext<THeksherValue>) => (
-  function HeksherProvider({children, value}: HeksherProviderProps<THeksherValue>) {
-    const currentValueRef = useRef(value);
-    const {subscribe, dispatch} = useSubscribeToFields();
+  function HeksherProvider({children, value: newValueOrStrategy}: HeksherProviderProps<THeksherValue>) {
+    const newStrategy = isRenderStrategy(newValueOrStrategy) ? newValueOrStrategy : createDefaultRenderStrategy(newValueOrStrategy);
+    const subscription = useCallbackSubscription();
+    const currentStrategyRef = useRef(newStrategy);
 
     useEffect(() => {
-      const oldValue = currentValueRef.current;
-      currentValueRef.current = value;
+      const oldStrategy = currentStrategyRef.current;
+      currentStrategyRef.current = newStrategy;
 
-      dispatchChanges(oldValue, value, dispatch);
-    }, [value]);
+      oldStrategy.render(newStrategy, subscription.callbackMap);
+    }, [newStrategy]);
 
     const getValue = () => {
-      return currentValueRef.current;
+      return currentStrategyRef.current.value;
     }
+
+    const subscribe = subscription.subscribe;
 
     return (
       <subscribeContext.Provider value={useMemo(() => ({subscribe, getValue}), [])}>

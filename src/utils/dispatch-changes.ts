@@ -1,7 +1,7 @@
 import { DispatchFunctions } from '../hooks';
 import { doesValueHaveFields } from './does-value-have-fields';
 
-const getChangedFields = (oldValue: unknown, newValue: unknown): Array<string> => {
+export const getChangedFields = (oldValue: unknown, newValue: unknown): Array<string> => {
   const keys = [...new Set(Object.keys(oldValue).concat(Object.keys(newValue)))];
 
   return keys.filter(key => oldValue[key] !== newValue[key]);

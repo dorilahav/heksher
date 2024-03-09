@@ -1,6 +1,6 @@
 {
   "name": "heksher",
-  "version": "0.1.3",
+  "version": "0.2.0-alpha",
   "description": "Heksher is like the cool, upgraded sibling of the regular React Context API",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

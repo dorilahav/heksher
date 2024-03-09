@@ -18,15 +18,7 @@ export interface SubscribeToFieldsHook {
 }
 
 export const useSubscribeToFields = (): SubscribeToFieldsHook => {
-  const callbackMap = usePersistedClassValue(Map<string[], CallbackFunction>);
-
-  const subscribe = useCallback((fields: string[], callback: CallbackFunction) => {
-    callbackMap.set(fields, callback);
-
-    return () => {
-      callbackMap.delete(fields);
-    }
-  }, []);
+  const {subscribe, callbackMap} = useCallbackSubscription();
 
   const dispatch = useMemo<DispatchFunctions>(() => ({
     field: (field: string) => {
@@ -46,5 +38,22 @@ export const useSubscribeToFields = (): SubscribeToFieldsHook => {
   return {
     subscribe,
     dispatch
+  };
+}
+
+export const useCallbackSubscription = () => {
+  const callbackMap = usePersistedClassValue(Map<string[], CallbackFunction>);
+
+  const subscribe = useCallback((fields: string[], callback: CallbackFunction) => {
+    callbackMap.set(fields, callback);
+
+    return () => {
+      callbackMap.delete(fields);
+    }
+  }, []);
+
+  return {
+    subscribe,
+    callbackMap
   };
 }
